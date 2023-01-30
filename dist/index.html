@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>TodoList</title>
+  <link rel="shortcut icon" href="./uploads/todoListFavicon.png" type="image/x-icon">
+  <!-- <link rel="stylesheet" href="css/styles.css"> -->
+</head>
+
+<body>
+
+  <style>
+    body {
+      color: #444;
+      font-family: Tahoma;
+      display: flex;
+      height: 96vh;
+    }
+
+    #app {
+      width: 512px;
+      margin: auto;
+      box-shadow: 4px 4px 20px #888;
+      padding: 20px;
+      border-radius: 20px;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .startHidden {
+      display: none;
+    }
+
+    h3 {
+      margin: 4px;
+      font-weight: normal;
+    }
+
+    input {
+      width: 80%;
+      margin: 4px;
+      padding: 4px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    button {
+      background-color: #4c4;
+      font-size: 15px;
+      color: white;
+      padding: 4px;
+      margin: 4px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    button:hover {
+      opacity: 0.75;
+      cursor: pointer;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .alternative {
+      background-color: #44c;
+    }
+
+    .loading{
+      position: absolute;
+      top: calc(50% - 100px);
+      left: calc(50% - 100px);
+      z-index: 99;
+    }
+  </style>
+
+
+  <div id="app">
+    <!--Logotipo do TodoList-->
+    <div class="center">
+      <img src="./uploads/todoList.png">
+    </div>
+
+    <!-- Loading -->
+    <div class="loading">
+      <img src="./uploads/loading.gif" alt="animation-loading">
+    </div>
+
+    <!--Conteúdo destinado para usuários não autenticados-->
+    <div id="auth" class="center">
+      <!--Formulário de autenticação-->
+      <form id="authForm">
+        <h3 id="authFormTitle">Acesse a sua conta para continuar</h3>
+
+        <label for="email">E-mail: </label>
+        <input type="email" placeholder="E-mail" id="email">
+
+        <label for="password">Senha: </label>
+        <input type="password" placeholder="Senha" id="password">
+
+        <button type="submit" id="submitAuthForm">Acessar</button>
+      </form>
+
+      
+      <!--Alternar o fomulário de autenticação para o cadastro de novas contas-->
+      <p id="register">
+        Não possui uma conta?
+        <button class="alternative">Cadastrar uma nova conta</button>
+      </p>
+      <!-- Redefinição de senha -->
+      <p id="passwordReset">
+        Recuperar senha
+        <button id="btn-resetPassword" class="alternative">Redefinir minha senha</button>
+      </p>
+
+      <!--Alternar o fomulário de autenticação para o acesso de contas já existentes-->
+      <p id="access" class="startHidden">
+        Já possui uma conta?
+        <button class="alternative" id="access-account">Acesse a sua conta</button>
+      </p>
+      <br>
+      <p>
+        Ou acesse usando <br>
+        <img src="./uploads/google.png" alt="Login Google">
+      </p>
+    </div>
+
+    <!-- Conteúdo para usuários autenticados -->
+    <div class="userContent startHidden center">
+      <hr>
+        <p>Usuário autenticado</p>
+        <p id="userEmail"></p>
+        <br>
+        <p id="emailVerified"></p>
+        <div id="sendEmailVerificationDiv">
+          <button class="alternative">Verificar e-mail</button>
+        </div>
+        <button class="signout alternative">Sair</button>
+    </div>
+  </div>
+
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js"></script> -->
+  <!-- <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js"></script> -->
+
+  <!--Nossa programação em JavaScript-->
+  <script src="./bundle.js"></script>
+
+</body>
+
+</html>
