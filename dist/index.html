@@ -11,6 +11,7 @@
 <body>
 
   <style>
+
     body {
       color: #444;
       font-family: Tahoma;
@@ -79,6 +80,23 @@
       left: calc(50% - 100px);
       z-index: 99;
     }
+
+    #auth img{
+      cursor: pointer;
+      margin: 5px;
+    }
+    #auth img:hover{
+      opacity: 0.80;
+    }
+    #userImg {
+      height: 40px;
+      border-radius: 20px;
+    }
+
+    .danger{
+      background-color: red;
+    }
+
   </style>
 
 
@@ -126,23 +144,32 @@
         <button class="alternative" id="access-account">Acesse a sua conta</button>
       </p>
       <br>
+      <!-- Outros provedores de autenticação -->
       <p>
         Ou acesse usando <br>
-        <img src="./uploads/google.png" alt="Login Google">
+        <img id="auth-google" class="authFirebase" src="./uploads/google.png" alt="Login Google">
+        <img id="auth-github" class="authFirebase" src="./uploads/github.png" alt="Login GitHub">
+        <img id="auth-facebook" class="authFirebase" src="./uploads/facebook.png" alt="Login Facebook">
       </p>
     </div>
 
     <!-- Conteúdo para usuários autenticados -->
     <div class="userContent startHidden center">
       <hr>
-        <p>Usuário autenticado</p>
+      <div id="userInfo" class="center">
+        <img id="userImg">
+        <p id="userName"></p>
+        <!-- <p>Usuário autenticado</p> -->
         <p id="userEmail"></p>
         <br>
         <p id="emailVerified"></p>
         <div id="sendEmailVerificationDiv">
           <button class="alternative">Verificar e-mail</button>
         </div>
+        <button class="updateUser alternative">Mudar nome</button>
         <button class="signout alternative">Sair</button>
+        <button id="deleteUser" class="danger">Excluir conta</button>
+      </div>
     </div>
   </div>
 
