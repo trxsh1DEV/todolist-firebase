@@ -1,5 +1,9 @@
+
 import { initializeApp } from "firebase/app";
 import { getAuth, signOut ,onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider, signInWithRedirect, GithubAuthProvider, FacebookAuthProvider, updateProfile } from 'firebase/auth';
+import { getDatabase, ref} from 'firebase/database';
+import { addTask } from './database';
+
 
 const firebaseApp = initializeApp({
     apiKey: "AIzaSyBj4RHDMic71NXZgdAmdj6DiVMz_pqBdNg",
@@ -9,6 +13,16 @@ const firebaseApp = initializeApp({
     messagingSenderId: "745186816967",
     appId: "1:745186816967:web:285f2d6197c6a901425fe2"
 });
+
+// Exports para outros módulos
+
+let db = getDatabase(firebaseApp);
+let dbRef = ref(db, 'users');
+
+export {db, dbRef, auth};
+
+
+// Fim exports
 
 const authForm = document.getElementById('authForm');
 const authFormTitle = document.getElementById('authFormTitle');
@@ -27,7 +41,7 @@ const emailVerified = document.querySelector('#emailVerified');
 const verificationEmail = document.querySelector('#sendEmailVerificationDiv');
 // Atributos Extras (Configuração de E-mail)
 let actionCodeSettings = {
-    url: "http://localhost:3000/"
+    url: "https://todolist-c7650.firebaseapp.com"
 };
 
 const resetPassword = document.querySelector('#passwordReset');
@@ -40,9 +54,15 @@ const userImg = document.querySelector('#userImg');
 const nameUser = document.querySelector('.updateUser');
 const deleteAccount = document.querySelector('#deleteUser');
 
+// Outro módulo
+const todoForm = document.querySelector('#todoForm');
+
+
+
 // AUTENTICAÇÃO
 // Pegando o obj referente ao nosso BD de autenticações do usuário e obtendo o usuário atual
 const auth = getAuth(firebaseApp);
+
 // Traduzindo a autenticação para português 
 auth.languageCode = 'pt-BR';
 
@@ -249,10 +269,10 @@ function hideItem(element) {
 
 // Exibir conteúdo apenas para usuários autenticados;
 const showUserContent = (user) => {
-    console.log(user);
+    // console.log(user);
     // Se a autenticação foi feita por um provedor confiável, não é preciso o usuário verificar o e-mail
     // esse !== (diferente) de password é pq qnd nós mesmos autenticamos o usuário, esse providerId tem o atributo "password"
-    if(user.providerData[0].providerId !== password){
+    if(user.providerData[0].providerId != password){
         emailVerified.innerHTML = 'Autenticado por provedor confiável'
         hideItem(verificationEmail);
 
@@ -296,7 +316,7 @@ const updateUserName = (user) => {
         })
         .catch((err) => {
             alert('Erro ao atualizar o nome de usuário')
-            console.log(err);
+            // console.log(err);
         })
         .finally(() => hideItem(loading));
 
@@ -341,4 +361,23 @@ function showError(prefix, err){
 };
 
 // FIM DA AUTENTICAÇÃO
+
+// RealTime Database
+
+
+
+
+todoForm.onsubmit = (e) => {
+    e.preventDefault();
+    if(todoForm.name.value != ''){
+    addTask(todoForm.name.value, auth.currentUser.uid);
+    } else {
+        alert('O campo da tarefa não pode estar em branco');
+    }
+}
+
+
+
+
+
 
