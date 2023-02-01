@@ -3,11 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getAuth, signOut ,onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider, signInWithRedirect, GithubAuthProvider, FacebookAuthProvider, updateProfile } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 
-import { addTask, fillTodoList, listData } from './database';
+import { progressFeedback, fillTodoList, listData } from './database';
 
 const firebaseApp = initializeApp({
     apiKey: "AIzaSyBj4RHDMic71NXZgdAmdj6DiVMz_pqBdNg",
     authDomain: "todolist-c7650.firebaseapp.com",
+    databaseURL: "https://todolist-c7650-default-rtdb.firebaseio.com",
     projectId: "todolist-c7650",
     storageBucket: "todolist-c7650.appspot.com",
     messagingSenderId: "745186816967",
@@ -49,14 +50,15 @@ const search = document.querySelector('.search');
 
 // Exports para outros módulos
 let db = getDatabase(firebaseApp);
-let dbRef = getDatabase(firebaseApp);
+// let dbRef = getDatabase(firebaseApp);
+// let storage =
 
 
 // AUTENTICAÇÃO
 // Pegando o obj referente ao nosso BD de autenticações do usuário e obtendo o usuário atual
 const auth = getAuth(firebaseApp);
 
-// Traduzindo a autenticação e email de autenticação para português 
+// Traduzindo a autenticação e email de autenticação para português
 auth.languageCode = 'pt-BR';
 
 authForm.onsubmit = (e) => {
@@ -178,7 +180,7 @@ authOtherProviders.forEach((auths) => { // passando em todos os provedores e val
         // Poderiamos trocar o signInWithRedirect por signInWithPopup
     });
     // Fora do evento de clique
-    
+
     // Autenticação usando google (default)
     // authOtherProviders.addEventListener('click', () => {
     //     const provider = new GoogleAuthProvider();
@@ -261,8 +263,9 @@ function hideItem(element) {
 
 // Exibir conteúdo apenas para usuários autenticados;
 const showUserContent = (user) => {
+    hideItem(progressFeedback);
     fillTodoList();
-    
+
     search.addEventListener("keyup", () => {
         if(search.value != '') {
             listData();
@@ -270,7 +273,7 @@ const showUserContent = (user) => {
             fillTodoList();
         }
     });
-    
+
     // console.log(user);
 
     // Se a autenticação foi feita por um provedor confiável, não é preciso o usuário verificar o e-mail
@@ -311,7 +314,7 @@ const showAuth = () => {
 // Atualizando dados do usuário (name é só pra exemplificar)
 const updateUserName = (user) => {
     let newUserName = prompt('Informe um novo nome de usuário', userName.innerHTML);
-    
+
     if(newUserName && newUserName !== ''){
         userName.innerHTML = newUserName;
         showItem(loading);
@@ -357,8 +360,11 @@ function showError(prefix, err){
         case 'auth/popup-closed-by-user':
             alert(`${prefix} Você fechou a janela de popup antes da operação de login ser concluida!`);
             break;
+        case 'storage/canceled':
+            alert(`${prefix} Você cancelou a operação de upload antes de ser concluida`);
+            break;
 
-    
+
         default: alert(`${prefix} ${err.message}`)
     };
 
@@ -371,4 +377,4 @@ function showError(prefix, err){
 
 
 
-export {db, auth, showError, dbRef};
+export {db, auth, showError, firebaseApp, showItem, hideItem};
