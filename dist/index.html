@@ -96,6 +96,26 @@
     .danger{
       background-color: red;
     }
+    ul{
+      text-align: start;
+      list-style-type: none;
+      padding: 0;
+    }
+    li:hover{
+      background-color: #ddd;
+    }
+    li {
+      padding: 8px;
+      border-radius: 12px;
+    }
+    .todoBtn{
+      padding: 4px 8px;
+      border-radius: 5px;
+      float: right;
+      margin-left: 0 0 0 4px;
+      position: relative;
+      bottom: 7px;
+    }
 
   </style>
 
@@ -173,12 +193,22 @@
 
       <hr>
 
-      <div class="center">
+      <!-- Exibe a lista de tarefas do usuário -->
+      <div id="todoList" class="form-task">
+        <h3 id="todoCount">Carregando tarefas...</h3>
+        <div class="center">
+          <label for="search">Buscar: </label>
+          <input type="text" placeholder="Buscar" class="search">
+        </div>
+        <ul id="ulTodoList"></ul>
+      </div>
+
+      <div>
         <!-- Formulário de tarefas -->
         <form id="todoForm">
           <h3 id="todoFormTitle">Adicionar tarefa</h3>
           <label for="name">Tarefa</label>
-          <input type="text" name="name" placeholder="Tarefa...">
+          <input id="input-task" type="text" name="name" placeholder="Tarefa...">
           <button type="submit" id="submitTodoForm">Add Tarefa</button>
         </form>
       </div>
