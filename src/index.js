@@ -1,8 +1,9 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth, signOut ,onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider, signInWithRedirect, GithubAuthProvider, FacebookAuthProvider, updateProfile } from 'firebase/auth';
-import { getDatabase, ref} from 'firebase/database';
-import { addTask, fillTodoList } from './database';
+import { ref, get, orderByChild, query, startAt, limitToFirst, endAt, getDatabase } from 'firebase/database';
+
+import { addTask, fillTodoList, listData } from './database';
 
 const firebaseApp = initializeApp({
     apiKey: "AIzaSyBj4RHDMic71NXZgdAmdj6DiVMz_pqBdNg",
@@ -44,7 +45,10 @@ const nameUser = document.querySelector('.updateUser');
 const deleteAccount = document.querySelector('#deleteUser');
 
 // Referente a Tasks
-
+const search = document.querySelector('.search');
+const todoForm = document.querySelector('#todoForm');
+const ulTodoList = document.querySelector('#ulTodoList');
+const todoCount = document.querySelector('#todoCount');
 
 // Exports para outros módulos
 let db = getDatabase(firebaseApp);
@@ -262,7 +266,14 @@ function hideItem(element) {
 // Exibir conteúdo apenas para usuários autenticados;
 const showUserContent = (user) => {
     fillTodoList();
-
+    
+    search.addEventListener("keyup", () => {
+        if(search.value != '') {
+            listData();
+        } else {
+            fillTodoList();
+        }
+    });
     
     // console.log(user);
 
