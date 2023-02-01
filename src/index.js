@@ -1,7 +1,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth, signOut ,onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider, signInWithRedirect, GithubAuthProvider, FacebookAuthProvider, updateProfile } from 'firebase/auth';
-import { ref, get, orderByChild, query, startAt, limitToFirst, endAt, getDatabase } from 'firebase/database';
+import { getDatabase } from 'firebase/database';
 
 import { addTask, fillTodoList, listData } from './database';
 
@@ -20,7 +20,7 @@ const register = document.getElementById('register');
 const access = document.getElementById('access');
 
 const accessAccount = document.querySelector('#access-account');
-const userCurrent = ''; // Usuário atual
+// const userCurrent = ''; // Usuário atual
 // const registerAccount = document.querySelector('.alternative');
 const quitUser = document.querySelector('.signout');
 const loading = document.querySelector('.loading');
@@ -46,9 +46,6 @@ const deleteAccount = document.querySelector('#deleteUser');
 
 // Referente a Tasks
 const search = document.querySelector('.search');
-const todoForm = document.querySelector('#todoForm');
-const ulTodoList = document.querySelector('#ulTodoList');
-const todoCount = document.querySelector('#todoCount');
 
 // Exports para outros módulos
 let db = getDatabase(firebaseApp);
@@ -59,7 +56,7 @@ let dbRef = getDatabase(firebaseApp);
 // Pegando o obj referente ao nosso BD de autenticações do usuário e obtendo o usuário atual
 const auth = getAuth(firebaseApp);
 
-// Traduzindo a autenticação para português 
+// Traduzindo a autenticação e email de autenticação para português 
 auth.languageCode = 'pt-BR';
 
 authForm.onsubmit = (e) => {
@@ -152,9 +149,8 @@ btnResetPassword.addEventListener('click', () => {
 });
 
 // Autenticação atráves de outros provedores (Google, Facebook, etc)
-// OBS (Só pelo usuário logar pelo google, ele automaticamente já é autenticado após logar pelo seu e-mail)
-
-authOtherProviders.forEach((auths) => {
+// OBS (Só pelo usuário logar por um provedor como o google, ele automaticamente já é autenticado após logar pelo seu e-mail)
+authOtherProviders.forEach((auths) => { // passando em todos os provedores e validando autenticação
     auths.addEventListener('click', (e) => {
         const providers = e.target;
         let whichProvider;

@@ -1,4 +1,4 @@
-import { child, ref, set, push, onValue, get, onChildAdded, onChildChanged, remove, update, orderByChild, query, orderByValue, startAt, limitToFirst, endAt, orderByKey, limitToLast } from 'firebase/database';
+import { ref, set, push, onValue, remove, update, orderByChild, query, startAt, limitToFirst, endAt, orderByValue, orderByKey } from 'firebase/database';
 import {auth, db, showError, dbRef } from './index';
 
 const todoForm = document.querySelector('#todoForm');
@@ -46,62 +46,103 @@ const addTask = (task, userId) => {
 }
 
 // Exibe a lista de tarefas
-function fillTodoList(test){
-    let dbReference = ref(db, `users/${auth.currentUser.uid}`);
-    ulTodoList.innerHTML = '';
-    let childData = '';
-    // let test2 = query(dbReference, orderByChild("tarefas"), startAt(search.value), endAt(search.value + '\uf8ff'), limitToFirst(5));
+function fillTodoList(){
+    // let dbReference = ref(db, `users/${auth.currentUser.uid}`);
+    // const test2 = query(dbReference, orderByValue());
+    
+    const dbReference = myDbRefence();     
+    const test2 = dbReference;
+    showFront(test2, true);
+    
+    // onValue(test2, (snap) => {
+    //     // console.log(snap);
+    //         todoCount.innerHTML = `Você tem ${snap.size} tarefas`;
+    //         ulTodoList.innerHTML = '';
+    //         snap.forEach(childSnapShot => {
+    //             childData = (childSnapShot.val().tarefas)
+    //             // console.log(childData);
+                
+    //             const spanLi = document.createElement("span");
+    //             const li = document.createElement("li");
+                
+    //             childData = childSnapShot.val().tarefas;
+    
+    //             spanLi.appendChild(document.createTextNode(childData));
+    
+    //             // Definindo um id para o spanLi (tarefa) baseado no ID da BD
+    //             spanLi.id = childSnapShot.key;
+    //             li.appendChild(spanLi);
+    //             ulTodoList.appendChild(li);
+    
+    //             // Button of removed task
+    //             const liRemoveBtn = document.createElement("button");
+    //             liRemoveBtn.appendChild(document.createTextNode('Excluir')) // Criando texto do botão
+    //             // liRemoveBtn.setAttribute('onclick', `removeTodo(\"${childSnapShot.key}\")`)
+    //             liRemoveBtn.setAttribute('class', 'danger todoBtn'); // Setando classes para estilizar o botão
+    //             li.appendChild(liRemoveBtn); // add o botão de remoção na li
+    //             liRemoveBtn.addEventListener('click', () => {
+    //                 removeTodo(childSnapShot.key);
+    //             });
+    
+    //             // Button of updating data
+    //             const updateBtn = document.createElement("button");
+    //             updateBtn.appendChild(document.createTextNode('Editar'))
+    //             updateBtn.setAttribute('class', 'todoBtn');
+    //             li.appendChild(updateBtn); // add o botão de edição na li
+    //             updateBtn.addEventListener('click', () => {
+    //                 updateTodo(childSnapShot.key);
+    //             });
+    //         });
+    //         todoForm.reset();
+    //     })
 
 
-    // if(test){
-    //     dbReference = test2;
-    // }
     // Lendo dados em tempo real
-    onValue(dbReference, (snapshot) => {
-        todoCount.innerHTML = `Você tem ${snapshot.size} tarefas`;
-        ulTodoList.innerHTML = '';
+    // onValue(dbReference, (snapshot) => {
+    //     todoCount.innerHTML = `Você tem ${snapshot.size} tarefas`;
+    //     ulTodoList.innerHTML = '';
 
-        snapshot.forEach((childSnapShot) => {
-            // console.log(childData);
-            // Obtendo e exibindo os dados do usuário no HTML
-            const spanLi = document.createElement("span");
-            const li = document.createElement("li");
+    //     snapshot.forEach((childSnapShot) => {
+    //         console.log(childSnapShot.val());
+    //         // Obtendo e exibindo os dados do usuário no HTML
+    //         const spanLi = document.createElement("span");
+    //         const li = document.createElement("li");
             
-            childData = childSnapShot.val().tarefas;
+    //         childData = childSnapShot.val().tarefas;
 
-            spanLi.appendChild(document.createTextNode(childData));
+    //         spanLi.appendChild(document.createTextNode(childData));
 
-            // Definindo um id para o spanLi (tarefa) baseado no ID da BD
-            spanLi.id = childSnapShot.key;
-            li.appendChild(spanLi);
-            ulTodoList.appendChild(li);
+    //         // Definindo um id para o spanLi (tarefa) baseado no ID da BD
+    //         spanLi.id = childSnapShot.key;
+    //         li.appendChild(spanLi);
+    //         ulTodoList.appendChild(li);
 
-            // Button of removed task
-            const liRemoveBtn = document.createElement("button");
-            liRemoveBtn.appendChild(document.createTextNode('Excluir')) // Criando texto do botão
-            // liRemoveBtn.setAttribute('onclick', `removeTodo(\"${childSnapShot.key}\")`)
-            liRemoveBtn.setAttribute('class', 'danger todoBtn'); // Setando classes para estilizar o botão
-            li.appendChild(liRemoveBtn); // add o botão de remoção na li
-            liRemoveBtn.addEventListener('click', () => {
-                removeTodo(childSnapShot.key);
-            });
+    //         // Button of removed task
+    //         const liRemoveBtn = document.createElement("button");
+    //         liRemoveBtn.appendChild(document.createTextNode('Excluir')) // Criando texto do botão
+    //         // liRemoveBtn.setAttribute('onclick', `removeTodo(\"${childSnapShot.key}\")`)
+    //         liRemoveBtn.setAttribute('class', 'danger todoBtn'); // Setando classes para estilizar o botão
+    //         li.appendChild(liRemoveBtn); // add o botão de remoção na li
+    //         liRemoveBtn.addEventListener('click', () => {
+    //             removeTodo(childSnapShot.key);
+    //         });
 
-            // Button of updating data
-            const updateBtn = document.createElement("button");
-            updateBtn.appendChild(document.createTextNode('Editar'))
-            updateBtn.setAttribute('class', 'todoBtn');
-            li.appendChild(updateBtn); // add o botão de edição na li
-            updateBtn.addEventListener('click', () => {
-                updateTodo(childSnapShot.key);
-            });
+    //         // Button of updating data
+    //         const updateBtn = document.createElement("button");
+    //         updateBtn.appendChild(document.createTextNode('Editar'))
+    //         updateBtn.setAttribute('class', 'todoBtn');
+    //         li.appendChild(updateBtn); // add o botão de edição na li
+    //         updateBtn.addEventListener('click', () => {
+    //             updateTodo(childSnapShot.key);
+    //         });
 
-        });
-        todoForm.reset();
-    });
+    //     });
+    //     todoForm.reset();
+    // });
 
-    // Toda vez que houver uma mudança de valor nas tasks, vamos chamar essa função que lê os dados (em tempo real) - É menos otimizado, mas dependendo da aplicação é um excelente recurso
+    // Toda vez que houver qualquer mudança de valor nas tasks (add, editar, excluir), vamos chamar essa função que lê os dados (em tempo real) - É menos otimizado, mas dependendo da aplicação é um excelente recurso
     // Mas quanto maior a aplicação melhor seria a performance do "get" por não ficar fazendo esse monitoramento em tempo real
-    // onChildAdded(newDbReference, (snapshot) => {
+    // onChildChanged(newDbReference, (snapshot) => {
     //     myTasks.innerHTML = '';
     //     let size = snapshot.size;
     //     todoCount.innerHTML = `Você tem ${size} tarefas`
@@ -120,54 +161,94 @@ function fillTodoList(test){
     //         myTasks.innerHTML += `<br>${childData}`
     //     });
     // });
-
 };
 
 const listData = () => {
     const dbReference = myDbRefence();     
     let searchText = search.value.toLowerCase();
-        ulTodoList.innerHTML = '';
-        let childData = '';
+        // ulTodoList.innerHTML = '';
+        // let childData = '';
         const test2 = query(dbReference, orderByChild("taskLowerCase"), startAt(searchText), endAt(searchText + '\uf8ff'), limitToFirst(5));
+        showFront(test2, false)
 
-        get(test2)
-        .then((snap) => {
-            snap.forEach(childSnapShot => {
-                childData = (childSnapShot.val().tarefas)
-                // console.log(childData);
+        // Outros métodos de listagem (o get não é em tempo real)
+        // onValue(test2, (snap) => {
+        //     snap.forEach(childSnapShot => {
+        //         childData = (childSnapShot.val().tarefas)
+        //         // console.log(childData);
                 
-                const spanLi = document.createElement("span");
-                const li = document.createElement("li");
+        //         const spanLi = document.createElement("span");
+        //         const li = document.createElement("li");
                 
-                childData = childSnapShot.val().tarefas;
+        //         childData = childSnapShot.val().tarefas;
     
-                spanLi.appendChild(document.createTextNode(childData));
+        //         spanLi.appendChild(document.createTextNode(childData));
     
-                // Definindo um id para o spanLi (tarefa) baseado no ID da BD
-                spanLi.id = childSnapShot.key;
-                li.appendChild(spanLi);
-                ulTodoList.appendChild(li);
+        //         // Definindo um id para o spanLi (tarefa) baseado no ID da BD
+        //         spanLi.id = childSnapShot.key;
+        //         li.appendChild(spanLi);
+        //         ulTodoList.appendChild(li);
     
-                // Button of removed task
-                const liRemoveBtn = document.createElement("button");
-                liRemoveBtn.appendChild(document.createTextNode('Excluir')) // Criando texto do botão
-                // liRemoveBtn.setAttribute('onclick', `removeTodo(\"${childSnapShot.key}\")`)
-                liRemoveBtn.setAttribute('class', 'danger todoBtn'); // Setando classes para estilizar o botão
-                li.appendChild(liRemoveBtn); // add o botão de remoção na li
-                liRemoveBtn.addEventListener('click', () => {
-                    removeTodo(childSnapShot.key);
-                });
+        //         // Button of removed task
+        //         const liRemoveBtn = document.createElement("button");
+        //         liRemoveBtn.appendChild(document.createTextNode('Excluir')) // Criando texto do botão
+        //         // liRemoveBtn.setAttribute('onclick', `removeTodo(\"${childSnapShot.key}\")`)
+        //         liRemoveBtn.setAttribute('class', 'danger todoBtn'); // Setando classes para estilizar o botão
+        //         li.appendChild(liRemoveBtn); // add o botão de remoção na li
+        //         liRemoveBtn.addEventListener('click', () => {
+        //             removeTodo(childSnapShot.key);
+        //         });
     
-                // Button of updating data
-                const updateBtn = document.createElement("button");
-                updateBtn.appendChild(document.createTextNode('Editar'))
-                updateBtn.setAttribute('class', 'todoBtn');
-                li.appendChild(updateBtn); // add o botão de edição na li
-                updateBtn.addEventListener('click', () => {
-                    updateTodo(childSnapShot.key);
-                });
-            });
-        });
+        //         // Button of updating data
+        //         const updateBtn = document.createElement("button");
+        //         updateBtn.appendChild(document.createTextNode('Editar'))
+        //         updateBtn.setAttribute('class', 'todoBtn');
+        //         li.appendChild(updateBtn); // add o botão de edição na li
+        //         updateBtn.addEventListener('click', () => {
+        //             updateTodo(childSnapShot.key);
+        //         });
+        //     });
+        // })
+
+
+        // get(test2)
+        // .then((snap) => {
+        //     snap.forEach(childSnapShot => {
+        //         childData = (childSnapShot.val().tarefas)
+        //         // console.log(childData);
+                
+        //         const spanLi = document.createElement("span");
+        //         const li = document.createElement("li");
+                
+        //         childData = childSnapShot.val().tarefas;
+    
+        //         spanLi.appendChild(document.createTextNode(childData));
+    
+        //         // Definindo um id para o spanLi (tarefa) baseado no ID da BD
+        //         spanLi.id = childSnapShot.key;
+        //         li.appendChild(spanLi);
+        //         ulTodoList.appendChild(li);
+    
+        //         // Button of removed task
+        //         const liRemoveBtn = document.createElement("button");
+        //         liRemoveBtn.appendChild(document.createTextNode('Excluir')) // Criando texto do botão
+        //         // liRemoveBtn.setAttribute('onclick', `removeTodo(\"${childSnapShot.key}\")`)
+        //         liRemoveBtn.setAttribute('class', 'danger todoBtn'); // Setando classes para estilizar o botão
+        //         li.appendChild(liRemoveBtn); // add o botão de remoção na li
+        //         liRemoveBtn.addEventListener('click', () => {
+        //             removeTodo(childSnapShot.key);
+        //         });
+    
+        //         // Button of updating data
+        //         const updateBtn = document.createElement("button");
+        //         updateBtn.appendChild(document.createTextNode('Editar'))
+        //         updateBtn.setAttribute('class', 'todoBtn');
+        //         li.appendChild(updateBtn); // add o botão de edição na li
+        //         updateBtn.addEventListener('click', () => {
+        //             updateTodo(childSnapShot.key);
+        //         });
+        //     });
+        // });
 
         // Forma auternativa (da na mesma )
         // return onValue(test2, (snapshot) => {
@@ -208,6 +289,58 @@ const updateTodo = (key) => {
     update(dbReference, data)
     // .then(() => console.log('task add successfully'))
     .catch((err) => showError('Falha ao atualizar a tarefa', err));
+}
+
+const showFront = (test, listAll) => {
+    // const dbReference = myDbRefence(); 
+    // let searchText = search.value.toLowerCase();
+    //const test = query(dbReference, orderByChild("taskLowerCase"), startAt(searchText), endAt(searchText + '\uf8ff'), limitToFirst(5));
+        ulTodoList.innerHTML = '';
+        let childData = '';
+        const test2 = test
+
+        onValue(test2, (snap) => {
+            if(listAll){
+                todoCount.innerHTML = `Você tem ${snap.size} tarefas`;
+                ulTodoList.innerHTML = '';
+            }
+            snap.forEach(childSnapShot => {
+                childData = (childSnapShot.val().tarefas)
+                // console.log(childData);
+                
+                const spanLi = document.createElement("span");
+                const li = document.createElement("li");
+                
+                childData = childSnapShot.val().tarefas;
+    
+                spanLi.appendChild(document.createTextNode(childData));
+    
+                // Definindo um id para o spanLi (tarefa) baseado no ID da BD
+                spanLi.id = childSnapShot.key;
+                li.appendChild(spanLi);
+                ulTodoList.appendChild(li);
+    
+                // Button of removed task
+                const liRemoveBtn = document.createElement("button");
+                liRemoveBtn.appendChild(document.createTextNode('Excluir')) // Criando texto do botão
+                // liRemoveBtn.setAttribute('onclick', `removeTodo(\"${childSnapShot.key}\")`)
+                liRemoveBtn.setAttribute('class', 'danger todoBtn'); // Setando classes para estilizar o botão
+                li.appendChild(liRemoveBtn); // add o botão de remoção na li
+                liRemoveBtn.addEventListener('click', () => {
+                    removeTodo(childSnapShot.key);
+                });
+    
+                // Button of updating data
+                const updateBtn = document.createElement("button");
+                updateBtn.appendChild(document.createTextNode('Editar'))
+                updateBtn.setAttribute('class', 'todoBtn');
+                li.appendChild(updateBtn); // add o botão de edição na li
+                updateBtn.addEventListener('click', () => {
+                    updateTodo(childSnapShot.key);
+                });
+            });
+            if(listAll) todoForm.reset();
+        })
 }
 
 
