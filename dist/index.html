@@ -120,6 +120,15 @@
     #emailVerified{
       margin-bottom: 7px;
     }
+    .imgTodo{
+      height: 20px;
+      margin-right: 7px;
+      border-radius: 4px;
+    }
+    span{
+      position: relative;
+      bottom: 4.6px;
+    }
 
   </style>
 
@@ -129,7 +138,6 @@
     <div class="center">
       <img src="./uploads/todoList.png">
     </div>
-
     <!-- Loading -->
     <div class="loading">
       <img src="./uploads/loading.gif" alt="animation-loading">
@@ -149,7 +157,6 @@
 
         <button type="submit" id="submitAuthForm">Acessar</button>
       </form>
-
 
       <!--Alternar o fomulário de autenticação para o cadastro de novas contas-->
       <p id="register">
@@ -216,8 +223,13 @@
 
           <label for="img-file">Figura: </label>
           <input type="file" id="img-file" name="file" accept="image/*">
-          <button type="submit" id="submitTodoForm">Add Tarefa</button>
+          <button type="submit" id="submitTodoForm">Adicionar Tarefa</button>
         </form>
+
+        <div id="cancelUpdateTodo" class="startHidden">
+          <button id="btnConfirmChanged">Confirmar alteração</button>
+          <button id="btnCancelChanged" class="alternative">Cancelar alteração</button>
+        </div>
 
         <div class="progress-feedback">
           <progress value="0" max="100" class="progress"></progress>

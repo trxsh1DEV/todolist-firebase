@@ -12,6 +12,7 @@ import {
   startAt,
   limitToFirst,
   endAt,
+  refFromURL,
 } from "firebase/database";
 import { auth, db, showError, firebaseApp, showItem, hideItem } from "./index";
 import {
@@ -19,6 +20,7 @@ import {
   getStorage,
   ref as refStorage,
   uploadBytesResumable,
+  deleteObject
 } from "firebase/storage";
 
 const todoForm = document.querySelector("#todoForm");
@@ -29,6 +31,11 @@ const progressFeedback = document.querySelector(".progress-feedback");
 const progress = document.querySelector(".progress");
 const playPauseBtn = document.querySelector("#btn-pause");
 const BtnCancel = document.querySelector("#btn-cancel");
+const cancelUpdateTodo = document.querySelector("#cancelUpdateTodo");
+const todoFormTitle = document.querySelector("#todoFormTitle");
+const submitTodoForm = document.querySelector("#submitTodoForm");
+const btnCancelChanged = document.querySelector("#btnCancelChanged");
+const btnConfirmChanged = document.querySelector("#btnConfirmChanged");
 
 const myDbRefence = () => ref(db, `users/${auth.currentUser.uid}`);
 const userCurrent = () => auth.currentUser.uid;
@@ -38,14 +45,23 @@ todoForm.onsubmit = (e) => {
   e.preventDefault();
 
   if (todoForm.name.value != "") {
-    let file = todoForm.file.files[0]; // seleciona apenas o primeiro arquivo
-    if (file != null) {
+    // let file = todoForm.file.files[0]; // seleciona apenas o primeiro arquivo
+    addAllFields();
+  }
+  else alert("O campo da tarefa não pode estar em branco");
+};
+
+const addAllFields = () => {
+  // console.log(push(myDbRefence()).key);
+  let file = todoForm.file.files[0];
+      if (file != null) {
       // if(file.type.includes('image')) se n tivessemos validado no html poderiamos filtrar se o usuário estava inserindo uma imagem cm esse code
 
       let storage = getStorage(firebaseApp);
       let storageRef = refStorage(
         storage,
-        `todoListFiles/${userCurrent()}/${random()}_${file.name}`
+        `todoListFiles/${userCurrent()}/${push(myDbRefence()).key}_${file.name}`
+        // `todoListFiles/${userCurrent()}/${random()}_${file.name}`
       );
       // let upload = uploadBytesResumable(storageRef, file)
       // .catch((err) => showError('Falha ao fazer upload de imagem', err))
@@ -68,9 +84,7 @@ todoForm.onsubmit = (e) => {
       // Se o formulário tiver apenas uma tarefa (txt);
       addTask(todoForm.name.value, false, myDbRefence());
     }
-  }
-  else alert("O campo da tarefa não pode estar em branco");
-};
+}
 
 const trackUpload = (upload) => {
   // Criando Promise personalizada (isso é para podermos anexar nossas imagens dps de upadas com sucesso nas tarefas)
@@ -145,6 +159,7 @@ const cancelFile = (upload) => {
   upload.cancel();
   // alert("Upload cancelado pelo usuário");
   hideItem(progressFeedback);
+  resetTodoForm();
 };
 
 const addTask = (task, downloadUrl) => {
@@ -397,68 +412,41 @@ const listData = () => {
   //     onlyOnce: true
   //   });
 };
-// Remove tarefas
-const removeTodo = (key) => {
-  const dbReference = ref(db, `users/${userCurrent()}/${key}`);
-  let selectedItem = document.querySelector(`#${key}`);
 
-  let confirmation = confirm(
-    `Deseja realmente remover a tarefa "${selectedItem.innerHTML}"?`
-  );
-  if (confirmation) {
-    remove(dbReference)
-      // .then(() => alert('Task removed'))
-      .catch((err) => showError("Falha ao tentar remover a tarefa", err));
-  }
-};
-
-// Atualiza tarefas
-const updateTodo = (key) => {
-  const dbReference = ref(db, `users/${userCurrent()}/${key}`);
-  let selectedItem = document.querySelector(`#${key}`);
-  let newTodo = prompt(
-    `Digite o nome da nova tarefa "${selectedItem.innerHTML}: "`,
-    selectedItem.innerHTML
-  );
-
-  if (newTodo == "") return alert("Este campo não pode ficar vazio");
-
-  let data = {
-    tarefas: newTodo,
-    taskLowerCase: newTodo.toLowerCase(),
-  };
-  // Atualizando a tarefa
-  update(dbReference, data)
-    // .then(() => console.log('task add successfully'))
-    .catch((err) => showError("Falha ao atualizar a tarefa", err));
-};
-
+// Função responsável por exibir e filtrar as tarefas
 const showFront = (test, listAll) => {
   // const dbReference = myDbRefence();
   // let searchText = search.value.toLowerCase();
   //const test = query(dbReference, orderByChild("taskLowerCase"), startAt(searchText), endAt(searchText + '\uf8ff'), limitToFirst(5));
   ulTodoList.innerHTML = "";
-  let childData = "";
+  // let childData = "";
   const test2 = test;
 
+  // Exibindo e filtrando as tarefas
   onValue(test2, (snap) => {
-    if (listAll) {
-      todoCount.innerHTML = `Você tem ${snap.size} tarefas`;
-      ulTodoList.innerHTML = "";
-    }
+    // if (listAll) {
+      // todoCount.innerHTML = `Você tem ${snap.size} tarefas`;
+      // ulTodoList.innerHTML = "";
+    // }
+    todoCount.innerHTML = `Você tem ${snap.size} tarefas`;
+    ulTodoList.innerHTML = "";
     snap.forEach((childSnapShot) => {
-      childData = childSnapShot.val().tarefas;
-      // console.log(childData);
-
+      const childData = childSnapShot.val().tarefas;
+      const imgData = childSnapShot.val().imgUrl;
       const spanLi = document.createElement("span");
       const li = document.createElement("li");
+      li.id = childSnapShot.key; // o id do li vai definir como selecionamos uma tarefa, assim podendo alterar a tarefa e imagem
 
-      childData = childSnapShot.val().tarefas;
+      let imgLi = document.createElement("img");
+      // Configurando o src(origem da imagem) como a URL da imagem anexada a tarefa, se n tiver img terá então a imagem default
+      imgLi.src = imgData ? imgData : 'uploads/defaultTodo.png'; // dentro do childData temos os valores das nossas chaves do BD (tasks, imgUrl)
+      imgLi.setAttribute('class', 'imgTodo'); // classe para selecionarmos e estilizarmos a img
+      li.appendChild(imgLi); // add img dentro do li (juntamente a task);
 
       spanLi.appendChild(document.createTextNode(childData));
-
       // Definindo um id para o spanLi (tarefa) baseado no ID da BD
-      spanLi.id = childSnapShot.key;
+      // spanLi.id = childSnapShot.key;
+
       li.appendChild(spanLi);
       ulTodoList.appendChild(li);
 
@@ -484,6 +472,156 @@ const showFront = (test, listAll) => {
     if (listAll) todoForm.reset();
   });
 };
+
+// Remove tarefas
+const removeTodo = (key) => {
+  const dbReference = ref(db, `users/${userCurrent()}/${key}`);
+  // let selectedItem = document.querySelector(`#${key}`); // seleciona a li completa com task e img
+  let todoName = document.querySelector(`#${key} > span`); // pegando span que está dentro da li, baseado no id(key) do elemento
+  let todoImg = document.querySelector(`#${key} > img`); // pegando img que está dentro da li, baseado no id(key) do elemento
+
+  let confirmation = confirm(
+    `Deseja realmente remover a tarefa "${todoName.innerHTML}"?`
+  );
+  if (confirmation) {
+    remove(dbReference)
+      // .then(() => alert('Task removed'))
+      .catch((err) => showError("Falha ao tentar remover a tarefa", err));
+      removeFile(todoImg.src) // Removendo a img associada a essa task baseado no src que é origem da img (nesse caso a URL do storage)
+  }
+};
+
+// Remove arquivos (imagens)
+const removeFile = (imgUrl) => {
+  // se dentro do src da nossa img contiver o valor referente ao caminho da imagem padrão, não fazemos nd, pois essa img n está no nosso storage e sim no nosso código
+  // a função indexOf pega só o primeiro caractere, mas como tudo que está hospedado no storage começa com "https" esse primeiro "u" de uploads vai servir pra distinguirmos
+  let result = imgUrl.indexOf('uploads/defaultTodo.png');
+  // Se o começo do indexOf não começar "u", ele vai retornar -1 que seria equivalente um "false"
+  // Se a imagem não for a imagem padrão, exclua a img do storage
+  if(result == -1) {
+    let storage = getStorage(firebaseApp);
+    let storageRef = refStorage(storage,`${imgUrl}`);
+
+    // Deletando imagem do storage
+    deleteObject(storageRef)
+    .then(() => console.log('imagem removida'))
+    .catch((err) => console.log(err.message))
+
+  } else {
+    console.log('Nenhuma imagem removida');
+  }
+};
+
+// Restaura estado inicial do formulário de tarefas
+
+const resetTodoForm = () => {
+  todoFormTitle.innerHTML = 'Adicionar tarefa',
+  hideItem(cancelUpdateTodo);
+  submitTodoForm.style.display = 'initial' // Caso a parte onde setar o display como 'block' ia atrapalhar o posicionamento do button
+
+  todoForm.name.value = '';
+  todoForm.file.value = '';
+};
+
+let updateTodoKey = null // variável global
+// Prepara o formulário para a atualização de tarefas
+const updateTodo = (key) => {
+  // resetTodoForm();
+  updateTodoKey = key; // atribui key dentro da váriavel global pra ser usada por outras functions (confirm e cancel update)
+  // console.log(updateTodoKey, key);
+  // const dbReference = ref(db, `users/${userCurrent()}/${key}`); // atribui o key dentro da referencia do BD
+  let todoName = document.querySelector(`#${key} > span`);
+
+  // Mudando o titulo e o contéudo dentro do input de "name"
+  todoFormTitle.innerHTML = `<strong>Editar a tarefa</strong>: ${todoName.innerHTML}`
+  todoForm.name.value = todoName.innerHTML;
+
+  hideItem(submitTodoForm);
+  showItem(cancelUpdateTodo)
+};
+// Botão de cancelar alterações (mudanças)
+btnCancelChanged.addEventListener("click", () => {
+  resetTodoForm();
+});
+
+// Botão de confirmar mudanças
+btnConfirmChanged.addEventListener("click", () => {
+  hideItem(cancelUpdateTodo);
+  if(todoForm.name.value != ''){
+    return confirmTodoUpdate();
+  } else {
+    alert('Você não pode alterar uma tarefa vazia');
+    return resetTodoForm();
+  };
+});
+
+// Confirma a atualização das tarefas
+const confirmTodoUpdate = () => {
+  // console.log(updateTodoKey);
+  hideItem(cancelUpdateTodo);
+    let todoImg = document.querySelector(`#${updateTodoKey} > img`); // pegando img atual selecionada pelo key
+    let file = todoForm.file.files[0];
+    if (file != null) {
+    // if(file.type.includes('image')) se n tivessemos validado no html poderiamos filtrar se o usuário estava inserindo uma imagem cm esse code
+    let storage = getStorage(firebaseApp);
+    let storageRef = refStorage(storage,`todoListFiles/${userCurrent()}/${updateTodoKey}_${file.name}`);
+
+
+    let upload = uploadBytesResumable(storageRef, file);
+
+    trackUpload(upload).then(() => {
+      getDownloadURL(storageRef).then((downloadUrl) => {
+        let data = {
+          imgUrl: downloadUrl,
+          tarefas: todoForm.name.value,
+          taskLowerCase: todoForm.name.value.toLowerCase()
+        };
+
+        completeTodoUpdate(data, todoImg.src); // Completa a atualização de tarefas (persiste os dados no BD)
+      })
+    }).catch((err) => showError('Falha ao atualizar tarefa', err));
+
+    } else { // se nenhuma imagem for selecionada uma img)
+      let data = {
+        tarefas: todoForm.name.value,
+        taskLowerCase: todoForm.name.value.toLowerCase()
+      };
+
+      completeTodoUpdate(data); // Completa a atualização de tarefas (persiste os dados no BD)
+    };
+};
+
+const completeTodoUpdate = (data, imgUrl) =>{
+  const dbReference = ref(db, `users/${userCurrent()}/${updateTodoKey}`);
+  if(imgUrl) removeFile(imgUrl); // pegando src q no caso contém a url da img no storage, se existir uma img, remova-a
+  update(dbReference, data)
+  .catch((err) => showError("Falha ao atualizar a tarefa", err));
+  // Removendo imagem (storage)
+  resetTodoForm(); // após update da tarefa resetar o formulário
+}
+
+// Atualizando somente as tarefas (txt)
+// const updateTodo2 = (key) => {
+//   const dbReference = ref(db, `users/${userCurrent()}/${key}`);
+//   let selectedItem = document.querySelector(`#${key}`);
+//   let newTodo = prompt(
+//     `Digite o nome da nova tarefa "${selectedItem.innerHTML}: "`,
+//     selectedItem.innerHTML
+//   );
+
+//   if (newTodo == "") return alert("Este campo não pode ficar vazio");
+
+//   let data = {
+//     tarefas: newTodo,
+//     taskLowerCase: newTodo.toLowerCase(),
+//   };
+//   // Atualizando a tarefa
+//   update(dbReference, data)
+//     // .then(() => console.log('task add successfully'))
+//     .catch((err) => showError("Falha ao atualizar a tarefa", err));
+// };
+
+
 
 export { addTask, fillTodoList, listData, progressFeedback };
 
