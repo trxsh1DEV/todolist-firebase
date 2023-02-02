@@ -490,28 +490,6 @@ const removeTodo = (key) => {
       removeFile(todoImg.src) // Removendo a img associada a essa task baseado no src que é origem da img (nesse caso a URL do storage)
   }
 };
-
-// Remove arquivos (imagens)
-const removeFile = (imgUrl) => {
-  // se dentro do src da nossa img contiver o valor referente ao caminho da imagem padrão, não fazemos nd, pois essa img n está no nosso storage e sim no nosso código
-  // a função indexOf pega só o primeiro caractere, mas como tudo que está hospedado no storage começa com "https" esse primeiro "u" de uploads vai servir pra distinguirmos
-  let result = imgUrl.indexOf('uploads/defaultTodo.png');
-  // Se o começo do indexOf não começar "u", ele vai retornar -1 que seria equivalente um "false"
-  // Se a imagem não for a imagem padrão, exclua a img do storage
-  if(result == -1) {
-    let storage = getStorage(firebaseApp);
-    let storageRef = refStorage(storage,`${imgUrl}`);
-
-    // Deletando imagem do storage
-    deleteObject(storageRef)
-    .then(() => console.log('imagem removida'))
-    .catch((err) => console.log(err.message))
-
-  } else {
-    console.log('Nenhuma imagem removida');
-  }
-};
-
 // Restaura estado inicial do formulário de tarefas
 
 const resetTodoForm = () => {
@@ -555,6 +533,42 @@ btnConfirmChanged.addEventListener("click", () => {
   };
 });
 
+// Remove arquivos (imagens)
+const removeFile = (imgUrl) => {
+  let todoImg = document.querySelector(`#${updateTodoKey} > img`); // pegando img atual selecionada pelo key
+  // se dentro do src da nossa img contiver o valor referente ao caminho da imagem padrão, não fazemos nd, pois essa img n está no nosso storage e sim no nosso código
+  // a função indexOf pega só o primeiro caractere, mas como tudo que está hospedado no storage começa com "https" esse primeiro "u" de uploads vai servir pra distinguirmos
+  let result = imgUrl.indexOf('uploads/defaultTodo.png');
+  // Se o começo do indexOf não começar "u", ele vai retornar -1 que seria equivalente um "false"
+  // Se a imagem não for a imagem padrão, exclua a img do storage
+  if(result == -1) {
+    let storage = getStorage(firebaseApp);
+    let storageRef = refStorage(storage,`${imgUrl}`);
+
+    // Parei aqui
+    // let linkImgUrl = imgUrl;
+    // let finalImgUrl = linkImgUrl.substring(137, 137 + 15);
+    // let linkTodoImg = todoImg.src;
+    // let finalTodoImg = linkTodoImg.substring(137, 137 + 15);
+    // console.log(finalImgUrl);
+    // console.log(finalTodoImg);
+    // if(finalImgUrl == finalImgUrl){
+    //   console.log('imagens identicas, não deletetar do storage');
+    //   return false;
+    // }
+
+
+    // Deletando imagem do storage
+    deleteObject(storageRef)
+    .then(() => console.log('imagem removida'))
+    .catch((err) => console.log(err.message))
+
+    resetTodoForm(); // após update da tarefa resetar o formulário
+  } else {
+    console.log('Nenhuma imagem removida');
+  }
+};
+
 // Confirma a atualização das tarefas
 const confirmTodoUpdate = () => {
   // console.log(updateTodoKey);
@@ -565,7 +579,6 @@ const confirmTodoUpdate = () => {
     // if(file.type.includes('image')) se n tivessemos validado no html poderiamos filtrar se o usuário estava inserindo uma imagem cm esse code
     let storage = getStorage(firebaseApp);
     let storageRef = refStorage(storage,`todoListFiles/${userCurrent()}/${updateTodoKey}_${file.name}`);
-
 
     let upload = uploadBytesResumable(storageRef, file);
 
@@ -593,9 +606,19 @@ const confirmTodoUpdate = () => {
 
 const completeTodoUpdate = (data, imgUrl) =>{
   const dbReference = ref(db, `users/${userCurrent()}/${updateTodoKey}`);
-  if(imgUrl) removeFile(imgUrl); // pegando src q no caso contém a url da img no storage, se existir uma img, remova-a
+  console.log(updateTodoKey);
+
+  if(imgUrl){
+    console.log('exist image');
+    removeFile(imgUrl); // pegando src q no caso contém a url da img no storage, se existir uma img, remova-a
+  };
+
   update(dbReference, data)
-  .catch((err) => showError("Falha ao atualizar a tarefa", err));
+  .then(() => {
+    console.log('changed ok');
+  })
+  .catch((err) => showError('erro final', err));
+  console.log('final',updateTodoKey);
   // Removendo imagem (storage)
   resetTodoForm(); // após update da tarefa resetar o formulário
 }
