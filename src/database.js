@@ -60,7 +60,7 @@ const addAllFields = () => {
       let storage = getStorage(firebaseApp);
       let storageRef = refStorage(
         storage,
-        `todoListFiles/${userCurrent()}/${push(myDbRefence()).key}_${file.name}`
+        `todoListFiles/${userCurrent()}/${push(myDbRefence()).key}_${file.name}${random()}`
         // `todoListFiles/${userCurrent()}/${random()}_${file.name}`
       );
       // let upload = uploadBytesResumable(storageRef, file)
@@ -578,7 +578,7 @@ const confirmTodoUpdate = () => {
     if (file != null) {
     // if(file.type.includes('image')) se n tivessemos validado no html poderiamos filtrar se o usuário estava inserindo uma imagem cm esse code
     let storage = getStorage(firebaseApp);
-    let storageRef = refStorage(storage,`todoListFiles/${userCurrent()}/${updateTodoKey}_${file.name}`);
+    let storageRef = refStorage(storage,`todoListFiles/${userCurrent()}/${updateTodoKey}_${file.name}${random()}`);
 
     let upload = uploadBytesResumable(storageRef, file);
 
